@@ -6,7 +6,7 @@
 
 ## About
 
-Rendering realistic and dynamic skies is a challening problem in real-time computer graphics. The math behind light scattering is too complex to solve directly in real-time, but it can be done offline.
+Rendering realistic and dynamic skies is a challenging problem in real-time computer graphics. The math behind light scattering is too complex to solve directly in real-time, but it can be done offline.
 
 This program solves the atmospheric scattering equations for every possible view and sun direction, and stores the results in look-up tables. The tables can then be sampled in a fragment shader to reconstruct an accurate rendering of the sky at any time of day.
 
