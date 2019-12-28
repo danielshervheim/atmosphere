@@ -1,0 +1,16 @@
+NORMALIZATION
+
+rayleigh = rayleigh_from_table*(5.588319e-02 - 0.000000e+00) + 0.000000e+00
+mie = mie_from_table*(2.527083e-02 - 0.000000e+00) + 0.000000e+00
+
+SPECTRAL TO RGB
+
+R = 1.333209e+02
+G = 8.851855e+01
+B = 1.127552e+02
+
+SPECTRAL IRRADIANCE
+
+R = 1.526000e+00
+G = 1.910000e+00
+B = 2.080000e+00
