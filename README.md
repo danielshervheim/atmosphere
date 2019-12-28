@@ -1,9 +1,9 @@
 # Atmospheric Rendering
 
-[![cover](images/all.png)](https://danielshervheim.com/atmosphere/)
-
 ### [Web Demo](https://danielshervheim.com/atmosphere/)
 
+[![cover](images/all.png)](https://danielshervheim.com/atmosphere/)
+ 
 ## About
 
 Rendering realistic and dynamic skies is a challenging problem in real-time computer graphics. The math behind light scattering is too complex to solve directly in real-time, but it can be done offline.
