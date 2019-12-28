@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 // Constants.
 const TEXTURE_DIMENSION = 64;
 
@@ -105,6 +108,8 @@ function init()
     // Setup renderer.
     var canvas = document.querySelector('#c');
     renderer = new THREE.WebGLRenderer({canvas});
+    renderer.getContext().getExtension('OES_texture_float');
+    renderer.getContext().getExtension('OES_texture_float_linear');
 
     // Create the scene.
     scene = new THREE.Scene();
@@ -124,8 +129,8 @@ function init()
             rayleighTexture: { value: rayleighTexture },
             mieTexture: { value: mieTexture },
             exposure: { value: 1.0 },
-            rayleigh: { value: true },
-            mie: { value: true },
+            rayleighEnabled: { value: true },
+            mieEnabled: { value: true },
             mieG: { value: 0.85 },
         },
         vertexShader: vertexShader,
@@ -148,11 +153,11 @@ function init()
     gui.remember(guiOptions);
     gui.add(guiOptions, 'rayleigh').name("Rayleigh Scattering").onChange( function ()
     {
-        skySphere.material.uniforms.rayleigh.value = guiOptions.rayleigh;
+        skySphere.material.uniforms.rayleighEnabled.value = guiOptions.rayleigh;
     });
     gui.add(guiOptions, 'mie').name("Mie Scattering").onChange( function ()
     {
-        skySphere.material.uniforms.mie.value = guiOptions.mie;
+        skySphere.material.uniforms.mieEnabled.value = guiOptions.mie;
     });
     gui.add(guiOptions, 'mieG').min(-1.0).max(1.0).name("Mie Asymmetry Parameter").onChange( function ()
     {

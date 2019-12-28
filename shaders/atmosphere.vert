@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 varying vec3 vWorldPosition;
 
 void main()
