@@ -54,10 +54,8 @@ void main()
 
     // Convert the angles to texture coordinates using the parameterization function.
     // Note: we use abs+sign to avoid negative roots!
-    // float u = 0.5 * (1.0 + sign(cosV)*pow(abs(cosV), 1.0/3.0));
-    // float v = 0.5 * (1.0 + sign(cosL)*pow(abs(cosL), 1.0/3.0));
-    float u = (1.0 + cosV) / 2.0;
-    float v = (1.0 + cosL) / 2.0;
+    float u = 0.5 * (1.0 + sign(cosV)*pow(abs(cosV), 1.0/3.0));
+    float v = 0.5 * (1.0 + sign(cosL)*pow(abs(cosL), 1.0/3.0));
 
     // Sample the textures.
     vec3 rayleigh = texture2D(rayleighTexture, vec2(u, v)).rgb;
