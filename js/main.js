@@ -3,6 +3,7 @@
 
 // Constants.
 const TEXTURE_DIMENSION = 64;
+const msg = "Left-click + Drag to rotate.";
 
 // Content to be loaded.
 var rayleighTexture;
@@ -147,15 +148,16 @@ function init()
         rayleigh : true,
         mie : true,
         mieG : 0.85,
+        notice : msg,
         rotate: rotationTarget,
     };
     var gui = new dat.gui.GUI();
     gui.remember(guiOptions);
-    gui.add(guiOptions, 'rayleigh').name("Rayleigh Scattering").onChange( function ()
+    gui.add(guiOptions, 'rayleigh').name("Rayleigh").onChange( function ()
     {
         skySphere.material.uniforms.rayleighEnabled.value = guiOptions.rayleigh;
     });
-    gui.add(guiOptions, 'mie').name("Mie Scattering").onChange( function ()
+    gui.add(guiOptions, 'mie').name("Mie").onChange( function ()
     {
         skySphere.material.uniforms.mieEnabled.value = guiOptions.mie;
     });
@@ -166,6 +168,10 @@ function init()
     gui.add(guiOptions, 'exposure').name("Exposure").onChange( function ()
     {
         skySphere.material.uniforms.exposure.value = guiOptions.exposure;
+    });
+    gui.add(guiOptions, 'notice').name("Controls").onChange( function ()
+    {
+        guiOptions.notice = msg;
     });
     gui.add(guiOptions, 'rotate', [ 'light', 'camera' ]).name("Rotate").onChange( function ()
     {
