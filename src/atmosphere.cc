@@ -55,13 +55,11 @@ void Atmosphere::PrecomputeTable()
         // measuring the angle from the zenith, rather than the horizon.
 
         double u = x / (double)(table_dimension_ - 1);
-        // double theta_view_dir = acos(-pow(2.0 * u - 1.0, 3.0));
-        double theta_view_dir = acos(2.0 * u - 1.0);
+        double theta_view_dir = acos(-pow(2.0 * u - 1.0, 3.0));
         vec2 view_dir = vec2(sin(theta_view_dir), cos(theta_view_dir));
 
         double v = y / (double)(table_dimension_ - 1);
-        // double theta_light_dir = acos(-pow(2.0 * v - 1.0, 3.0));
-        double theta_light_dir = acos(2.0 * v - 1.0);
+        double theta_light_dir = acos(-pow(2.0 * v - 1.0, 3.0));
         vec2 light_dir = vec2(sin(theta_light_dir), cos(theta_light_dir));
 
         double rayleigh = 0.0;
