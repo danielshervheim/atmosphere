@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #ifndef ATMOSPHERE_H_
 #define ATMOSPHERE_H_
 

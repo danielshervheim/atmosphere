@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #ifndef VEC2_H_
 #define VEC2_H_
 

@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #ifndef COEFFICIENTS_H_
 #define COEFFICIENTS_H_
 

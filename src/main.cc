@@ -1,11 +1,5 @@
-/*
-todo:
-1. create a new instance of Atmosphere
-2. parse options from command line
-3. set Atmosphere options based on parsed commands
-4. precompute
-5. output results of precomputation
-*/
+// Daniel Shervheim, 2019
+// danielshervheim.com
 
 #include "atmosphere.h"
 #include "coefficients.h"

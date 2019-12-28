@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #include "coefficients.h"
 
 #include <cmath>

@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #ifndef UTILITIES_H_
 #define UTILITIES_H_
 

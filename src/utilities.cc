@@ -1,3 +1,6 @@
+// Daniel Shervheim, 2019
+// danielshervheim.com
+
 #include "utilities.h"
 
 #include "coefficients.h"
