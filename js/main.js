@@ -152,7 +152,6 @@ function init()
         rotate: rotationTarget,
     };
     var gui = new dat.gui.GUI();
-    gui.remember(guiOptions);
     gui.add(guiOptions, 'rayleigh').name("Rayleigh").onChange( function ()
     {
         skySphere.material.uniforms.rayleighEnabled.value = guiOptions.rayleigh;
