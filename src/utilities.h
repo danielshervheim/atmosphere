@@ -11,6 +11,9 @@
 class Utilities
 {
 public:
+    // Returns whether or not the given directory exists.
+    static bool DirectoryExists(const char* path);
+
     // Returns whether or not a ray intersects a circle. If the ray intersects
     // the circle, then the `t_min` and `t_max` parameters contain the hit points
     // for the parametric ray equation.

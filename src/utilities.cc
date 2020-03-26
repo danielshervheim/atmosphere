@@ -8,6 +8,29 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+bool Utilities::DirectoryExists(const char* path)
+{
+    // Source:
+    // https://stackoverflow.com/questions/18100097/portable-way-to-check-if-directory-exists-windows-linux-c
+
+    struct stat info;
+    if(stat(path, &info) != 0)
+    {
+        // Cannot access.
+        return false;
+    }
+    else if (info.st_mode & S_IFDIR)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 bool Utilities::RayCircleIntersection(vec2 ray_origin, vec2 ray_direction,
     vec2 circle_center, double circle_radius,

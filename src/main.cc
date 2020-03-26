@@ -13,7 +13,7 @@
 #include <half.h>
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     Atmosphere atmosphere;
     std::string output_path = "";
@@ -28,10 +28,25 @@ int main(int argc, char *argv[])
             if (i+1 < argc)
             {
                 output_path = argv[i+1];
+
+                // Verify output path ends in /
+                if (argv[i+1][output_path.size()-1] != '/')
+                {
+                    std::cout << "ERROR: provided ouput path must end in \"/\"." << std::endl;
+                    return -1;
+                }
+
+                // Verify output path exists.
+                if (!Utilities::DirectoryExists(argv[i+1]))
+                {
+                    std::cout << "ERROR: provided ouput path does not exist." << std::endl;
+                    return -1;
+                }
             }
             else
             {
-                // TODO: Error.
+                std::cout << "ERROR: -o must be followed by a space and a valid path." << std::endl;
+                return -1;
             }
         }
 
