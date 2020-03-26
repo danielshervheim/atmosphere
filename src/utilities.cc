@@ -71,8 +71,16 @@ bool Utilities::WriteFloatArrayToFile(std::string file_path, float* array, int a
         return false;
     }
 
-    out.write((char*)array, sizeof array[0] * array_length);
-    out.close();
+    try
+    {
+        out.write((char*)array, sizeof array[0] * array_length);
+        out.close();
+    }
+    catch(const std::exception &exc)
+    {
+        (void)exc;
+        return false;
+    }
     return true;
 }
 

@@ -12,7 +12,6 @@
 #include <ImfRgba.h>
 #include <half.h>
 
-
 int main(int argc, char* argv[])
 {
     Atmosphere atmosphere;
@@ -77,9 +76,18 @@ int main(int argc, char* argv[])
             int j = i / 3;
             pixels[j] = Imf::Rgba(rayleigh[i+0], rayleigh[i+1], rayleigh[i+2], 1.0);
         }
-        Imf::RgbaOutputFile rayleigh_file(rayleigh_path, DIM, DIM, Imf::WRITE_RGBA);
-        rayleigh_file.setFrameBuffer(pixels, 1, DIM);
-        rayleigh_file.writePixels(DIM);
+
+        try
+        {
+            Imf::RgbaOutputFile rayleigh_file(rayleigh_path, DIM, DIM, Imf::WRITE_RGBA);
+            rayleigh_file.setFrameBuffer(pixels, 1, DIM);
+            rayleigh_file.writePixels(DIM);
+        }
+        catch (const std::exception &exc)
+        {
+            (void)exc;
+            std::cout << "ERROR: failed to write rayleigh table to .exr file." << std::endl;
+        }
 
         // Write the mie table to an OpenEXR file.
         double* mie = atmosphere.GetPrecomputedMieTable();
@@ -90,9 +98,17 @@ int main(int argc, char* argv[])
             int j = i / 3;
             pixels[j] = Imf::Rgba(mie[i+0], mie[i+1], mie[i+2], 1.0);
         }
-        Imf::RgbaOutputFile mie_file(mie_path, DIM, DIM, Imf::WRITE_RGBA);
-        mie_file.setFrameBuffer(pixels, 1, DIM);
-        mie_file.writePixels(DIM);
+        try
+        {
+            Imf::RgbaOutputFile mie_file(mie_path, DIM, DIM, Imf::WRITE_RGBA);
+            mie_file.setFrameBuffer(pixels, 1, DIM);
+            mie_file.writePixels(DIM);
+        }
+        catch (const std::exception &exc)
+        {
+            (void)exc;
+            std::cout << "ERROR: failed to write rayleigh table to .exr file." << std::endl;
+        }
 
         delete [] pixels;
     }
@@ -133,7 +149,8 @@ int main(int argc, char* argv[])
     std::ofstream info(output_path + "results.txt", std::ios::out);
     if(!info)
     {
-        std::cout << "ERROR: Could not write information to file." << std::endl;
+        std::cout << "ERROR: Could not write precomputed parameter results to file." << std::endl;
+        return -1;
     }
 
     // If normalization was enabled, write the formulas needed to reconstruct
@@ -143,8 +160,9 @@ int main(int argc, char* argv[])
         info << "NORMALIZATION" << std::endl;
         info << std::scientific << std::endl;
 
-        info << "rayleigh = rayleigh_from_table*(" << maxR << " - " << minR << ") + " << minR << std::endl;
-        info << "mie = mie_from_table*(" << maxM << " - " << minM << ") + " << minM << std::endl;
+        info << "Rayleigh min, max = (" << minR << ", " << maxR << ")" << std::endl;
+        info << "Mie min, max = (" << minM << ", " << maxM << ")" << std::endl;
+
         info << std::endl;
     }
 
@@ -167,4 +185,6 @@ int main(int argc, char* argv[])
 
     // Close the file.
     info.close();
+
+    return 0;
 }

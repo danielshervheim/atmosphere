@@ -37,4 +37,4 @@ build/
 
 *.exr
 *.bin
-results.txt
+*results.txt

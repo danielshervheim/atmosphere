@@ -30,6 +30,7 @@ public:
     // calling `delete [] ARRAYNAME`.
     static float* ConvertDoubleArrayToFloatArray(double* array, int array_length);
 
+    // TODO: document this.
     static void ConvertXyzToRgb(double x, double y, double z, double& r, double& g, double& b);
 };
 
