@@ -3,7 +3,7 @@
 ### [Web Demo](https://danielshervheim.com/atmosphere/)
 
 [![cover](images/all.png)](https://danielshervheim.com/atmosphere/)
- 
+
 ## About
 
 Rendering realistic and dynamic skies is a challenging problem in real-time computer graphics. The math behind light scattering is too complex to solve directly in real-time, but it can be done offline.
@@ -41,14 +41,20 @@ To use it:
 1. Clone this repository.
 2. `cd` into `atmosphere/`
 3. Run `make`.
-4. Run `./build/atmosphere`, or optionally `./build/atmosphere -o some/output/dir` to specifiy a custom output directory.
+4. Run `./build/atmosphere`.
+
+You can include a number of runtime flags as well:
+
+- `-o <output_dir>` puts the results into the specified directory.
+- `-n` normalizes the pre-computation results into the 0...1 range.
+- `-exr` outputs to `.exr` files rather than binary float arrays. (This requires the OpenEXR library. You might have to set the path correctly in the makefile).
 
 
 
 This program outputs three files:
 
-1. `rayleigh.bin` contains the precomputed rayleigh scattering table in the form of a binary-encoded float array.
-2. `mie.bin` contains the precomputed mie scattering table in the form of a binary-encoded float array.
+1. `rayleigh.bin` contains the precomputed Rayleigh scattering table in the form of a binary-encoded float array (or `.exr` if the -exr flag is set).
+2. `mie.bin` contains the precomputed Mie scattering table in the form of a binary-encoded float array (or `.exr` if the -exr flag is set).
 3. `results.txt` contains the necessary constants to correctly render the atmosphere in your renderer of choice.
 
 
@@ -67,14 +73,14 @@ For a complete example of using the precomputed data in a renderer, please see t
 
 1. Load each table as a float array.
 2. Create 64x64 RGB floating point textures from each array.
-3. Upload the rayleigh and mie textures to the GPU.
+3. Upload the Rayleigh and Mie textures to the GPU.
 4. In the fragment shader, convert the current view-zenith and sun-zenith angle into texture coordinates with the following formula:
    1. `u = 0.5 * (1.0 + sign(cosViewZenith)*pow(abs(cosViewZenith), 1.0/3.0));`
    2. `v = 0.5 * (1.0 + sign(cosSunZenith)*pow(abs(cosSunZenith), 1.0/3.0));`
-5. Sample the rayleigh and mie textures with the texture coordinate `(u, v)`.
-6. Remap the rayleigh and mie values with the `min` and `max` constants from `results.txt`.
-7. Multiply the rayleigh and mie values with their respective phase functions.
-8. Add the rayleigh and mie values to get the total scattering.
+5. Sample the Rayleigh and Mie textures with the texture coordinate `(u, v)`.
+6. Remap the Rayleigh and Mie values with the `min` and `max` constants from `results.txt`.
+7. Multiply the Rayleigh and Mie values with their respective phase functions.
+8. Add the Rayleigh and Mie values to get the total scattering.
 9. Multiply the total scattering by the spectral irradiance constants from `results.txt` to compute the radiance.
 10. Multiply the radiance by the spectral-to-rgb conversion constants from `results.txt` to compute the rgb color.
 11. Tonemap the rgb color via `rgb = pow(1.0 - exp(-rgb), 1.0/2.2)`.

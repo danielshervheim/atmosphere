@@ -14,7 +14,7 @@ public:
     double lambda_r_ = 650.0;
     double lambda_g_ = 510.0;
     double lambda_b_ = 475.0;
-    bool normalize_precomputation_results_ = true;
+    bool normalize_precomputation_results_ = false;
 
     // Integration parameters.
     int view_ray_integration_steps_ = 64;

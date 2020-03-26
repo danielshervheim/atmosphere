@@ -8,10 +8,17 @@
 #include <iostream>
 #include <fstream>
 
+#include <ImfRgbaFile.h>
+#include <ImfRgba.h>
+#include <half.h>
+
+
 int main(int argc, char *argv[])
 {
     Atmosphere atmosphere;
     std::string output_path = "";
+
+    bool writeToExr = false;
 
     // TODO: parse the command line input for additional parameters.
     for (int i = 1; i < argc; i++)
@@ -27,32 +34,78 @@ int main(int argc, char *argv[])
                 // TODO: Error.
             }
         }
+
+        if (strcmp(argv[i], "-exr") == 0)
+        {
+            writeToExr = true;
+        }
+
+        if (strcmp(argv[i], "-n") == 0)
+        {
+            atmosphere.normalize_precomputation_results_ = true;
+        }
     }
 
     atmosphere.PrecomputeTable();
 
-    // Convert the Rayleigh table to a float array and write it to a file.
-    float* rayleigh = Utilities::ConvertDoubleArrayToFloatArray(
-        atmosphere.GetPrecomputedRayleighTable(),
-        atmosphere.GetTableLength()
-    );
-    if (!Utilities::WriteFloatArrayToFile(output_path + "rayleigh.bin", rayleigh, atmosphere.GetTableLength()))
+    if (writeToExr)
     {
-        std::cout << "ERROR: Could not write rayleigh table to file." << std::endl;
-    }
+        const int DIM = atmosphere.table_dimension_;
+        Imf::Rgba *pixels = new Imf::Rgba[DIM * DIM];
 
-    // Convert the Mie table to a float array and write it to a file.
-    float* mie = Utilities::ConvertDoubleArrayToFloatArray(
-        atmosphere.GetPrecomputedMieTable(),
-        atmosphere.GetTableLength()
-    );
-    if (!Utilities::WriteFloatArrayToFile(output_path + "mie.bin", mie, atmosphere.GetTableLength()))
+        // Write the rayleigh table to an OpenEXR file.
+        double* rayleigh = atmosphere.GetPrecomputedRayleighTable();
+        char rayleigh_path[output_path.size() + 12 + 1];
+        strcpy(rayleigh_path, (output_path + "rayleigh.exr").c_str());
+        for (int i = 0; i < DIM*DIM*3; i += 3)
+        {
+            int j = i / 3;
+            pixels[j] = Imf::Rgba(rayleigh[i+0], rayleigh[i+1], rayleigh[i+2], 1.0);
+        }
+        Imf::RgbaOutputFile rayleigh_file(rayleigh_path, DIM, DIM, Imf::WRITE_RGBA);
+        rayleigh_file.setFrameBuffer(pixels, 1, DIM);
+        rayleigh_file.writePixels(DIM);
+
+        // Write the mie table to an OpenEXR file.
+        double* mie = atmosphere.GetPrecomputedMieTable();
+        char mie_path[output_path.size() + 7 + 1];
+        strcpy(mie_path, (output_path + "mie.exr").c_str());
+        for (int i = 0; i < DIM*DIM*3; i += 3)
+        {
+            int j = i / 3;
+            pixels[j] = Imf::Rgba(mie[i+0], mie[i+1], mie[i+2], 1.0);
+        }
+        Imf::RgbaOutputFile mie_file(mie_path, DIM, DIM, Imf::WRITE_RGBA);
+        mie_file.setFrameBuffer(pixels, 1, DIM);
+        mie_file.writePixels(DIM);
+
+        delete [] pixels;
+    }
+    else
     {
-        std::cout << "ERROR: Could not write mie table to file." << std::endl;
-    }
+        // Convert the Rayleigh table to a float array and write it to a file.
+        float* rayleigh = Utilities::ConvertDoubleArrayToFloatArray(
+            atmosphere.GetPrecomputedRayleighTable(),
+            atmosphere.GetTableLength()
+        );
+        if (!Utilities::WriteFloatArrayToFile(output_path + "rayleigh.bin", rayleigh, atmosphere.GetTableLength()))
+        {
+            std::cout << "ERROR: Could not write rayleigh table to file." << std::endl;
+        }
 
-    delete [] rayleigh;
-    delete [] mie;
+        // Convert the Mie table to a float array and write it to a file.
+        float* mie = Utilities::ConvertDoubleArrayToFloatArray(
+            atmosphere.GetPrecomputedMieTable(),
+            atmosphere.GetTableLength()
+        );
+        if (!Utilities::WriteFloatArrayToFile(output_path + "mie.bin", mie, atmosphere.GetTableLength()))
+        {
+            std::cout << "ERROR: Could not write mie table to file." << std::endl;
+        }
+
+        delete [] rayleigh;
+        delete [] mie;
+    }
 
     double minR, maxR, minM, maxM;
     atmosphere.GetNormalizationFactorsRayleigh(minR, maxR);
