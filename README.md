@@ -43,27 +43,27 @@ To use it:
 3. Run `make`.
 4. Run `./build/atmosphere`.
 
-You can include a number of runtime flags as well:
+You can specify a number of runtime flags to control the pre-computation:
 
-- `-o <output_dir>` puts the results into the specified directory.
-- `-n` normalizes the pre-computation results into the 0...1 range.
+- `-o <output_dir>` puts the results into the specified directory. (The directory must exist).
+- `-n` normalizes the pre-computed results into the [0, 1] range. This helps preserve precision in the double to float conversion process.
 - `-exr` outputs to `.exr` files rather than binary float arrays. (This requires the OpenEXR library. You might have to set the path correctly in the makefile).
 
 
 
 This program outputs three files:
 
-1. `rayleigh.bin` contains the precomputed Rayleigh scattering table in the form of a binary-encoded float array (or `.exr` if the -exr flag is set).
-2. `mie.bin` contains the precomputed Mie scattering table in the form of a binary-encoded float array (or `.exr` if the -exr flag is set).
+1. `rayleigh` contains the precomputed Rayleigh scattering table as either a binary-encoded float array (`.bin`) or an HDR image (`.exr`).
+2. `mie` contains the precomputed Mie scattering table as either a binary-encoded float array (`.bin`) or an HDR image (`.exr`).
 3. `results.txt` contains the necessary constants to correctly render the atmosphere in your renderer of choice.
 
 
 
-I excluded the spectral intensity `Ii(λ)` and phase function `F(θ)` terms from the results. They are constant anyway, and in deferring them to a fragment shader we can avoid some visual artifacts around the sun.
+I excluded the spectral intensity `Ii(λ)` and phase function `F(θ)` terms from the pre-computed results. They are constant anyway, and in deferring them to a fragment shader we can avoid some visual artifacts around the sun.
 
 
 
-I also normalized the table values in the 0...1 range to preserve as much precision as possible when converting between floats and doubles. After you sample the table in a fragment shader, you must un-normalize the values with the following formula: `val = val * (max - min) + min`. The max and min values are written into `results.txt` as part of the precomputation process.
+I also provide the option to normalize the table values in the [0, 1] range to preserve as much precision as possible when converting from doubles to floats. After you sample the tables in a fragment shader, you must un-normalize the values with the following formula: `val = val * (max - min) + min`. The max and min values are written into `results.txt` as part of the pre-computation process.
 
 
 
@@ -83,4 +83,5 @@ For a complete example of using the precomputed data in a renderer, please see t
 8. Add the Rayleigh and Mie values to get the total scattering.
 9. Multiply the total scattering by the spectral irradiance constants from `results.txt` to compute the radiance.
 10. Multiply the radiance by the spectral-to-rgb conversion constants from `results.txt` to compute the rgb color.
-11. Tonemap the rgb color via `rgb = pow(1.0 - exp(-rgb), 1.0/2.2)`.
+11. If you are working in a low dynamic range renderer, you must tone-map the rgb color via `rgb = pow(1.0 - exp(-rgb), 1.0/2.2)`.
+12. If you are working in an HDR environment, you should let your post processing filter handle the HDR color grading and tone-mapping.
