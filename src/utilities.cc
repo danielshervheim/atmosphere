@@ -39,11 +39,13 @@ bool Utilities::RayCircleIntersection(vec2 ray_origin, vec2 ray_direction,
     t_min = 0.0;
     t_max = 0.0;
 
-    double a = 1.0;  // Assumes `ray_direction` is unit vector.
-    double b = 2.0 * vec2::dot(ray_direction, ray_origin - circle_center);
-    double c = pow(vec2::magnitude(ray_origin - circle_center), 2.0) - pow(circle_radius, 2.0);
+    vec2 circle_to_ray_origin = ray_origin - circle_center;
 
-    double discriminant = pow(b, 2.0) - (4.0 * a * c);
+    double a = vec2::dot(ray_direction, ray_direction);
+    double b = 2.0 * vec2::dot(ray_direction, circle_to_ray_origin);
+    double c = vec2::dot(circle_to_ray_origin, circle_to_ray_origin) - circle_radius*circle_radius;
+
+    double discriminant = b*b - (4.0 * a * c);
 
     if (discriminant < 0)
     {
