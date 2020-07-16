@@ -31,6 +31,9 @@ public:
     double scale_height_rayleigh_ = 8000.0;  // TODO: explain what these are.
     double scale_height_mie_ = 1200.0;
 
+    // Exponent for lending more precision to horizon vs zeniths
+    double texture_exponent_ = 3.0;
+
     Atmosphere();
     ~Atmosphere();
 
@@ -57,6 +60,9 @@ private:
     void PrecomputeTableCell(vec2 view_dir, vec2 light_dir, double lambda, double& rayleigh, double& mie);
 
     void NormalizeTable();
+
+    double TextureCoordinateToCosTheta(double cosTheta);
+    double CosThetaToTextureCoordinate(double cosTheta);
 };
 
 #endif  // ATMOSPHERE_H_
