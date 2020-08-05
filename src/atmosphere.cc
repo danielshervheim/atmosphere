@@ -83,6 +83,32 @@ void Atmosphere::PrecomputeTable()
     {
         NormalizeTable();
     }
+
+    // Compute transmittance
+    if (precomputed_transmittance_table_ != nullptr)
+    {
+        delete [] precomputed_transmittance_table_;
+    }
+    precomputed_transmittance_table_ = new double[table_dimension_*3];
+
+    for (int i = 0; i < table_dimension_*3; i += 3)
+    {
+        int j = i/3;
+        double u = (j+0.5) / (double)(table_dimension_);
+        double theta_view_dir = acos(TextureCoordinateToCosTheta(u));
+        vec2 view_dir = vec2(sin(theta_view_dir), cos(theta_view_dir));
+
+        double transmittance = 0.0;
+
+        PrecomputeTransmittance(view_dir, lambda_r_, transmittance);
+        precomputed_transmittance_table_[i+0] = transmittance;
+
+        PrecomputeTransmittance(view_dir, lambda_g_, transmittance);
+        precomputed_transmittance_table_[i+1] = transmittance;
+
+        PrecomputeTransmittance(view_dir, lambda_b_, transmittance);
+        precomputed_transmittance_table_[i+2] = transmittance;
+    }
 }
 
 int Atmosphere::GetTableLength()
@@ -98,6 +124,11 @@ double* Atmosphere::GetPrecomputedRayleighTable()
 double* Atmosphere::GetPrecomputedMieTable()
 {
     return precomputed_mie_table_;
+}
+
+double* Atmosphere::GetPrecomputedTransmittanceTable()
+{
+    return precomputed_transmittance_table_;
 }
 
 void Atmosphere::GetNormalizationFactorsRayleigh(double& min, double& max)
@@ -250,6 +281,66 @@ void Atmosphere::PrecomputeTableCell(vec2 view_dir, vec2 light_dir, double lambd
 
     // We defer the inclusion of the phase and spectral intensity terms to
     // the pixel shader, because they are constant anyways.
+}
+
+void Atmosphere::PrecomputeTransmittance(vec2 view_dir, double lambda, double& transmittance)
+{
+    transmittance = 0.0;
+
+    // `pa`, the viewing position. We offset the planet radius by the height
+    // of an average human to get a typical viewing position.
+    vec2 pa = vec2(0.0, radius_planet_ + 1.8);
+
+    double dist_to_pb;
+    double t_min, t_max;
+
+    // Intersect the viewing ray with the atmosphere.
+    if (!Utilities::RayCircleIntersection(pa, view_dir, vec2(0.0, 0.0), radius_atmosphere_, t_min, t_max))
+    {
+        std::cerr << "pa outside the atmosphere. ensure that the atmosphere radius is greater than the planet radius." << std::endl;
+    }
+
+    dist_to_pb = t_max;
+
+    // Intersect the viewing ray with the ground. This ensures that we do not
+    // integrate through the planet to the atmosphere on the opposite side.
+    if (Utilities::RayCircleIntersection(pa, view_dir, vec2(0.0, 0.0), radius_planet_, t_min, t_max))
+    {
+        transmittance = 0.0;
+        return;
+    }
+
+    // Compute `pb`, the intersection of the `view_dir` ray with the atmosphere
+    // from `pa`.
+    vec2 pb = pa + (view_dir * dist_to_pb);
+
+    const double kViewDelta = vec2::magnitude(pb - pa) / (double)view_ray_integration_steps_;
+
+    double optical_depth_rayleigh = 0.0;
+    double optical_depth_mie = 0.0;
+    double optical_depth_ozone = 0.0;
+
+    // Integrate from `pa` to `pb`.
+    for (int i = 0; i < view_ray_integration_steps_; i++)
+    {
+        double t = (double)i / (double)(view_ray_integration_steps_ - 1.0);
+        vec2 p = vec2::lerp(pa, pb, t);
+
+        // Compute the height of the point `p` from the surface of the planet.
+        double height_p = vec2::magnitude(p) - radius_planet_;
+
+        optical_depth_rayleigh += exp(-height_p / scale_height_rayleigh_) * kViewDelta;
+        optical_depth_mie += exp (-height_p / scale_height_mie_) * kViewDelta;
+        optical_depth_ozone += exp(-height_p / scale_height_rayleigh_) * 6e-7 * kViewDelta;
+    }
+
+    optical_depth_rayleigh *= Coefficients::GetRayleighExtinctionCoefficient(lambda);
+    optical_depth_mie *= Coefficients::GetMieExtinctionCoefficient(lambda);
+    optical_depth_ozone *= Coefficients::GetOzoneExtinctionCoefficient(lambda);
+
+    double optical_depth = optical_depth_rayleigh + optical_depth_mie + optical_depth_ozone;
+
+    transmittance = exp(-optical_depth);
 }
 
 void Atmosphere::NormalizeTable()

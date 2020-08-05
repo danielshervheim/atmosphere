@@ -111,6 +111,29 @@ int main(int argc, char* argv[])
         }
 
         delete [] pixels;
+
+        // Write transmittance to file.
+        pixels = new Imf::Rgba[DIM];
+        double* transmittance = atmosphere.GetPrecomputedTransmittanceTable();
+        char transmittance_path[output_path.size() + 17 + 1];
+        strcpy(transmittance_path, (output_path + "transmittance.exr").c_str());
+        for (int i = 0; i < DIM*3; i += 3)
+        {
+            int j = i / 3;
+            pixels[j] = Imf::Rgba(transmittance[i+0], transmittance[i+1], transmittance[i+2], 1.0);
+        }
+        try
+        {
+            Imf::RgbaOutputFile transmittance_file(transmittance_path, DIM, 1, Imf::WRITE_RGBA);
+            transmittance_file.setFrameBuffer(pixels, 1, DIM);
+            transmittance_file.writePixels(1);
+        }
+        catch (const std::exception &exc)
+        {
+            (void)exc;
+            std::cout << "ERROR: failed to write transmittance table to .exr file." << std::endl;
+        }
+        delete [] pixels;
     }
     else
     {

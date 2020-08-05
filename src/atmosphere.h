@@ -43,6 +43,8 @@ public:
     double* GetPrecomputedRayleighTable();
     double* GetPrecomputedMieTable();
 
+    double* GetPrecomputedTransmittanceTable();
+
     void GetNormalizationFactorsRayleigh(double& min, double& max);
     void GetNormalizationFactorsMie(double& min, double& max);
 
@@ -51,6 +53,8 @@ private:
     double* precomputed_rayleigh_table_ = nullptr;
     double* precomputed_mie_table_ = nullptr;
 
+    double* precomputed_transmittance_table_ = nullptr;
+
     double normalization_min_rayleigh_;
     double normalization_max_rayleigh_;
 
@@ -58,6 +62,7 @@ private:
     double normalization_max_mie_;
 
     void PrecomputeTableCell(vec2 view_dir, vec2 light_dir, double lambda, double& rayleigh, double& mie);
+    void PrecomputeTransmittance(vec2 view_dir, double lambda, double& transmittance);
 
     void NormalizeTable();
 
